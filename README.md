@@ -64,16 +64,13 @@ This tool is intended for ethical security testing and educational purposes only
 
 ## Author
 
-* **mesh** ([https://github.com/Meson-Tools](https://github.com/Meson-Tools))
+* **mesh** ([https://github.com/MessH-Tools](https://github.com/MessH-Tools))
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache 2.0 License](LICENSE).
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
 
----
-
-This description provides a more structured and informative overview of the "DiCtiONARY" tool, making it more suitable for a GitHub repository's README file. It includes sections for features, usage, a disclaimer, author information, licensing, and how to contribute. Remember to create a `LICENSE` file in your repository if you choose to use the MIT license.
