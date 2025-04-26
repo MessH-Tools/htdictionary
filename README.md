@@ -50,11 +50,11 @@ DiCtiONARY provides a menu-driven interface to the following tools:
     ```
 2.  **Make the script executable:**
     ```bash
-    chmod +x dictionary.sh
+    chmod +x htdictionary
     ```
 3.  **Run the script:**
     ```bash
-    ./dictionary.sh
+    ./htdictionary
     ```
 4.  Follow the on-screen menu to select and run the desired tools.
 
