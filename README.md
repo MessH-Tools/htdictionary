@@ -1,4 +1,4 @@
-![Hack Tool Dictionary](https://github.com/MessH-Tools/htdictionary/Images/dictionary-main.png)
+![Hack Tool Dictionary](https://github.com/MessH-Tools/htdictionary/main/Images/dictionary-main.png)
 
 Thank you for watching this Tool!
 
