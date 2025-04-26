@@ -68,7 +68,7 @@ This tool is intended for ethical security testing and educational purposes only
 
 ## License
 
-This project is licensed under the [Apache 2.0 License](LICENSE).
+This project is licensed under the [Apache 2.0 License](LICENSE.txt).
 
 ## Contributing
 
