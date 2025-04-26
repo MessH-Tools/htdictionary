@@ -1,5 +1,5 @@
-![Hack Tool Dictionary](https://github.com/MessH-Tools/htdictionary/main/Images/dictionary-main.png)
 
+<img src="(https://github.com/MessH-Tools/htdictionary/blob/main/Images/dictionary-main.png)" width="750" height="300">
 Thank you for watching this Tool!
 
 I just need to make sure that every body knows:
