@@ -1,48 +1,366 @@
 #!/bin/bash
 
-red='\033[0;31m'
-green='\033[0;32m'
-yellow='\033[0;33m'
-blue='\033[0;34m'
-magenta='\033[0;35m'
-cyan='\033[0;36m'
-white='\033[0;37m'
-reset='\033[0m'
-term_width=$(tput cols)
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+RESET='\033[0m'
 
 # x = color
 # preset: echo -e "${COLOR}...{RESET}"
 
-echo -e "$blue"
-figlet -f slant "MyTool" 2>/dev/null || echo -e "${green}Starting MyTool..."
-echo -e "${reset}"
 
-# typing effect
-
-typing_effect() {
-	message="$1"
-	for ((i=0; i<${#message}; i++)); do
-	 echo -ne "${yellow}${message:$i:1}${reset}"
- 	 sleep 0.087
-	done
-	echo ""
-}
-
-typing_effect "Initializing modules..."
-
-
-# spinner animation
+# starting tor
 fancy_spinner() {
- local spin=('l      ''lo     ''loa    ''load   ''loadi  ''loadin ''loading')
- local i=7
+ local spin=('.    ''..   ''...  ''.... ''.....')
+ local i=5
  while :; do
-  i=$(( (i+7) % ${#spin} ))
-  echo -ne  "\r${green}${spin:$i:7}"
+  i=$(( (i+5) % ${#spin} ))
+  echo -ne  "\r${GREEN}[Starting Tor${spin:$i:5}]${reset}"
   sleep 0.2
 done
 }
 
-(sleep 5) &
+
+(sleep 1) &
+spinner_pid=$!
+fancy_spinner &
+spinner_bg=$!
+wait $spinner_pid
+kill $spinner_bg &>/dev/null
+sudo service tor start
+echo -e "\r${YELLOW}[Tor Ready!] $reset"
+
+
+# starting OpenVPN
+fancy_spinner() {
+ local spin=('.    ''..   ''...  ''.... ''.....')
+ local i=5
+ while :; do
+  i=$(( (i+5) % ${#spin} ))
+  echo -ne  "\r${GREEN}[Starting OpenVPN${spin:$i:5}]${reset}"
+  sleep 0.2
+done
+}
+
+(sleep 1.345) &
+spinner_pid=$!
+fancy_spinner &
+spinner_bg=$!
+wait $spinner_pid
+kill $spinner_bg &>/dev/null
+sudo openvpn --config /etc/openvpn/<your-vpn.ovpn> --daemon
+echo -e "\r${YELLOW}[OpenVPN Ready!] $reset"
+
+# IP check
+fancy_spinner() {
+ local spin=('.    ''..   ''...  ''.... ''.....')
+ local i=5
+ while :; do
+  i=$(( (i+5) % ${#spin} ))
+  echo -ne  "\r${GREEN}[Checking IP${spin:$i:5}]${reset}"
+  sleep 0.2
+done
+}
+
+(sleep 0.25) &
+spinner_pid=$!
+fancy_spinner &
+spinner_bg=$!
+wait $spinner_pid
+kill $spinner_bg &>/dev/null
+proxychains curl ifconfig.me; return
+echo -e "\r${YELLOW}[IP Checked and Ready!] $reset"
+
+
+# wrap everything in proxychains
+
+if [[ "$0" != *proxychains* && "$1" != "--proxied" ]]; then
+	exec proxychains "$0" --proxied "$@"
+fi
+
+# center text
+term_width=$(tput cols)
+
+
+# --- Hydra Menu ---
+
+hydra_menu() {
+	while true; do
+	clear
+	echo -e "$RED|=======================================================|"
+	echo -e "|        ______  __       _________                     |"
+	echo -e "|        ___  / / /____  _______  /____________ _       |"
+	echo -e "|        __  /_/ /__  / / /  __  /__  ___/  __ '/       |"
+	echo -e "|        _  __  / _  /_/ // /_/ / _  /   / /_/ /        |"
+	echo -e "|        /_/ /_/  _\__, / \__,_/  /_/    \__,_/         |"
+	echo -e "|                 /____/                                |"
+	echo -e "|=======================================================|"
+	echo -e "|'DiCtiONARY' by   mesh   			        |"
+	echo -e "|=======================================================|"
+	echo -e "| 1) hydra -L <username-list.txt> -P <password-list.txt>|"
+	echo -e "| 2) hydra -l <username> -P <password-list.txt> 	|"
+	echo -e "| 3) hydra -L <username-list.txt> -p <password>	 	|"
+	echo -e "| 							|"
+	echo -e "| 99) enter own cmd					|"
+	echo -e "| 00) Return						|"
+	echo -e "|=======================================================|$RESET"
+	read -p "Command >>>	" cmd
+	
+	case $cmd in
+		1) read -p "Enter target IP-Adress: " target
+		read -p "Enter username-list path: " userlist
+		read -p "Enter password-list path: " passlist
+		echo -e "$GREEN Running hydra user-/passlist check on $target...$RESET"
+		hydra -L "$userlist" -P "$passlist" ssh://$target
+		;;
+		
+		2) read -p "Enter target IP-Adress: " target
+		read -p "Enter username: " user
+		read -p "Enter password-list path: " passlist
+		echo -e "$GREEN Running hydra pass-list check on $target...$RESET"
+		hydra -l "$user" -P "$passlist" ssh://$target
+		;;
+		
+		3) read -p "Enter target IP-Adress: " target
+		read -p "Enter username-list path: " userlist
+		read -p "Enter password: " pass
+		echo -e "$GREEN Running hydra userlist check on $target...$RESET"
+		hydra -L "$userlist" -p "$pass" ssh://$target
+		;;
+		
+		99) read -p "Command >>>	" cmd
+		$cmd
+		;;
+		
+		00) 
+		break
+		;;
+		
+		*)
+		echo -e "$RED Command Unknown. Try again...$RESET"
+		sleep 1
+		;;
+	esac
+		read -p "Press Enter to continue..."
+	done
+}
+
+
+
+# --- Hashcat Menu ---
+
+hashcat_menu() {
+	while true; do
+	clear
+	echo -e "$YELLOW|================================================================|"
+	echo -e "|		 _  _  __    __  _  _  ___ __ _____ 		 |"
+	echo -e "|		| || |/  \ /' _/| || |/ _//  \_   _|		 |"
+	echo -e "|		| >< | /\ |'._'.| >< | \_| /\ || |  		 |"
+	echo -e "|		|_||_|_||_||___/|_||_|\__/_||_||_|  		 |"
+	echo -e "|================================================================|"
+	echo -e "|'DiCtiONARY' by   mesh 					 |"
+	echo -e "|================================================================|"
+	echo -e "| 1) hashcat -m <hash type> <hashlist.txt> <passlist.txt> --show |"
+	echo -e "| 2) hashcat --help | grep <hash-type>			   	 |"
+	echo -e "| 3) hashcat --help 						 |"
+	echo -e "| 								 |"
+	echo -e "| 99) enter own cmd					 	 |"
+	echo -e "| 00) Return						 	 |"
+	echo -e "|================================================================|$RESET"
+	read -p "Command >>>	" cmd
+	
+	case $cmd in
+		1) read -p "Enter target hash-type: " hashtp
+		read -p "Enter hashlist path: " hashlist
+		read -p "Enter passlist path: " passlist
+		echo -e "$GREEN Running hashcat hash checker...$RESET"
+		hashcat -m $hashtp $hashlist $passlist --show
+		;;
+		
+		2) read -p "Enter target hash-type: " hashtp
+		echo -e "$GREEN Running hashcat hash Info...$RESET"
+		hashcat --help | grep $hashtp
+		;;
+		
+		3) echo -e "$GREEN Running hashcat --help...$RESET"
+		hashcat --help
+		;;
+		
+		99) read -p "Command >>>	" cmd
+		$cmd
+		;;
+		
+		00) 
+		break
+		;;
+		
+		*)
+		echo -e "$RED Command Unknown. Try again...$RESET"
+		sleep 1
+		;;
+	esac
+		read -p "Press Enter to continue..."
+	done
+}
+
+
+# --- Crunch Menu ---
+
+crunch_menu() {
+	while true; do
+	clear
+	echo -e "$GREEN|================================================================================|"
+	echo -e "|		_______  ______ _     _ __   _ _______ _     _			 |"
+	echo -e "|		|       |_____/ |     | | \  | |       |_____|			 |"
+	echo -e "|		|_____  |    \_ |_____| |  \_| |_____  |     |			 |"
+	echo -e "|================================================================================|"
+	echo -e "|'DiCtiONARY' by   mesh 							 |"
+	echo -e "|================================================================================|"
+	echo -e "| 1) crunch <min. pass lenght> <max. pass lenght> <any letter/symbol/number> 	 |"
+	echo -e "| 2) crunch <same thing as in 1)> -t <specify if numb./b. lett./s. lett. /symb.> |"
+	echo -e "| 3) crunch --help								 |"
+	echo -e "| 						 		 		 |"	
+	echo -e "| 99) enter own cmd							 	 |"
+	echo -e "| 00) Return						 			 |"
+	echo -e "|================================================================================|$RESET"
+	read -p "Command >>>	" cmd
+	
+	case $cmd in
+		1) read -p "Enter min. pass lenght: " min
+		read -p "Enter max. pass lenght: " max
+		read -p "Enter any Symbol/Number/letter that should be included in the passes: " symb
+		echo -e "$GREEN Running Crunch wordlist generation...$RESET"
+		crunch $min $max $symb
+		;;
+		
+		2) read -p "Enter min. pass lenght: " min1
+		read -p "Enter max. pass lenght: " max1
+		read -p "Enter any Symbol/Number/letter that should be included in the passes: " symb1
+		read -p "Enter any specifications (@/,/%/^)" specs1
+		echo -e "$GREEN Running Crunch wordlist generation...$RESET"
+		crunch $min1 $max1 $symb1 -t $specs1
+		;;
+		
+		3) echo -e "$YELLOW Starting help mode..."
+		man crunch
+		;;
+		
+		00) 
+		break
+		;;
+		
+		99) read -p "Command >>>	" cmd
+		$cmd
+		;;
+		
+		*)
+		echo -e "$RED Command Unknown. Try again...$RESET"
+		sleep 1
+		;;
+	
+	esac
+		read -p "Do you want to save List? [y/n] " ask
+		
+		case $ask in
+		y) read -p "Please enter the wordlist path you want to save the List in: " ;;
+
+		n) return ;;
+	esac
+		
+	done
+}
+
+
+
+# --- Fluxion Menu ---
+
+fluxion_menu() {
+	while true; do
+	clear
+	echo -e "$GREEN|==============================================================================|"
+	echo -e "|		_______  ______ _     _ __   _ _______ _     _			 |"
+	echo -e "|		|       |_____/ |     | | \  | |       |_____|			 |"
+	echo -e "|		|_____  |    \_ |_____| |  \_| |_____  |     |			 |"
+	echo -e "|================================================================================|"
+	echo -e "|'DiCtiONARY' by   mesh 							  |"
+	echo -e "|================================================================================|"
+	echo -e "| 1) crunch <min. pass lenght> <max. pass lenght> <any letter/symbol/number> 	 |"
+	echo -e "| 2) crunch <same thing as in 1)> -t <specify if numb./b. lett./s. lett. /symb.> |"
+	echo -e "| 3) crunch --help								 |"
+	echo -e "| 						 		 		 |"	
+	echo -e "| 99) enter own cmd							 	 |"
+	echo -e "| 00) Return						 			 |"s
+	echo -e "|================================================================================|$RESET"
+	read -p "Command >>>	" cmd
+	
+	case $cmd in
+		1) read -p "Enter min. pass lenght: " min
+		read -p "Enter max. pass lenght: " max
+		read -p "Enter any Symbol/Number/letter that should be included in the passes: " symb
+		echo -e "$GREEN Running Crunch wordlist generation...$RESET"
+		crunch $min $max $symb
+		;;
+		
+		2) read -p "Enter min. pass lenght: " min1
+		read -p "Enter max. pass lenght: " max1
+		read -p "Enter any Symbol/Number/letter that should be included in the passes: " symb1
+		read -p "Enter any specifications (@/,/%/^)" specs1
+		echo -e "$GREEN Running Crunch wordlist generation...$RESET"
+		crunch $min1 $max1 $symb1 -t $specs1
+		;;
+		
+		3) echo -e "$YELLOW Starting help mode..."
+		man crunch
+		;;
+		
+		00) 
+		break
+		;;
+		
+		99) read -p "Command >>>	" cmd
+		$cmd
+		;;
+		
+		*)
+		echo -e "$RED Command Unknown. Try again...$RESET"
+		sleep 1
+		;;
+	
+	esac
+		read -p "Do you want to save List? [y/n] " ask
+		
+		case $ask in
+		y) read -p "Please enter the wordlist path you want to save the List in: " ;;
+
+		n) return ;;
+	esac
+		
+	done
+}
+
+
+
+
+# --- Loading screen ---
+
+# spinner animation
+
+
+fancy_spinner() {
+ local spin=('L         ''Lo        ''Loa       ''Load      ''Loadi     ''Loadin    ''Loading   ''Loading.  ''Loading.. ''Loading...')
+ local i=10
+ while :; do
+  i=$(( (i+10) % ${#spin} ))
+  echo -ne  "\r${green}DiCtiONARY ${spin:$i:10}"
+  sleep 0.2
+done
+}
+
+(sleep 0.2) &
 spinner_pid=$!
 fancy_spinner &
 spinner_bg=$!
@@ -52,15 +370,60 @@ echo -e "\r$green Ready! $reset"
 
 
 
-# center text cmd
-center_text() {
- local text="$1"
- local len=${#text}
- local padding=$(( (term_width - len) / 2 ))
- printf "%*s%s\n" $padding "" "text"
-}
+# --- Main Menu
 
+while true; do
+	clear
+	sleep 0.5
+	echo -e "$MAGENTA|==================================================================================================|"
+	echo -e "|	 ______   ___   _______  _______  ___   _______  __    _  _______  ______    __   __ 	   |"
+	echo -e "|	|      | |   | |       ||       ||   | |       ||  |  | ||   _   ||    _ |  |  | |  |	   |"
+	echo -e "|	|  _    ||   | |       ||_     _||   | |   _   ||   |_| ||  |_|  ||   | ||  |  |_|  |	   |"
+	echo -e "|	| | |   ||   | |       |  |   |  |   | |  | |  ||       ||       ||   |_||_ |       |	   |"
+	echo -e "|	| |_|   ||   | |      _|  |   |  |   | |  |_|  ||  _    ||       ||    __  ||_     _|	   |"
+	echo -e "|	|       ||   | |     |_   |   |  |   | |       || | |   ||   _   ||   |  | |  |   |  	   |"
+	echo -e "|	|______| |___| |_______|  |___|  |___| |_______||_|  |__||__| |__||___|  |_|  |___|  	   |"
+	echo -e "|==================================================================================================|$RESET"
+	echo -e "$YELLOW|by   mesh									 	           |$RESET"
+	echo -e "$MAGENTA|==================================================================================================|"
+	echo -e "| 01) GoPhish 											   |"
+	echo -e "| 02) MaskPhish (URL Mask) 									   |"
+	echo -e "| 03) zPhisher (SE-Phisher)								  	   |"
+	echo -e "| 04) InstaInsane (Instagram Password Hacker)							   |"
+	echo -e "| 05) Hydra (Online Password Hacking)								   |"
+	echo -e "| 06) HashCat (Password Hash Decoder)								   |"
+	echo -e "| 07) Crunch (Wordlist Creator)								 	   |"
+	echo -e "| 08) Wireshark											   |"
+	echo -e "| 09) Fluxion (Handshake Snooper)								   |"
+	echo -e "| 10) DDosTor (DDos attack/deauth)								   |"
+	echo -e "| 11) Sherlock	(Social Media Username search up)						   |"
+	echo -e "| 												   |"
+	echo -e "| 99) Own CMD  											   |"
+	echo -e "| 00) Exit 											   |"
+	echo -e "|==================================================================================================|$RESET"
+	read -p "Select an Option: " choice
+	
+	case $choice in
+	1) /opt/htdictionary/scripts/gophish/gophish.go ;;
+	2) /opt/htdictionary/scripts/maskphish/maskphish.sh ;;
+	3) /opt/htdictionary/scripts/zphisher/zphisher.sh ;;
+	4) /opt/htdictionary/scripts/instainsane/instainsane.sh ;;
+	5) hydra_menu ;;
+	6) hashcat_menu ;;
+	7) crunch_menu ;;
+	8) /usr/share/kali-menu/helper-scripts/wireshark.sh ;;
+	9) /opt/htdictionary/scripts/fluxion/fluxion.sh ;;
+	10) /opt/htdictionary/scripts/ddostor/ddostor.sh ;;
+	11) read -p "Username to be searched for:  " username-search
+	sherlock $username-search
+	;;
+	99) read -p "Command >>>   " cmd0
+	$cmd0
+	;;
+	00) echo "Exiting..."; sleep 2; exit 0 ;;
+	*) echo "Invalid option. Try again..." ;;
+	esac
+	read -p "Press Enter to continue..."
 
-
-
+done
 
