@@ -25,11 +25,11 @@ DiCtiONARY provides a menu-driven interface to the following tools:
     * **Hydra:** Online password guessing attacks.
     * **HashCat:** Password hash decoding utility.
     * **Crunch:** Wordlist generator for password attacks.
+    * **InstaInsane:** Instagram password brute-force tool.
 * **Phishing:**
     * **GoPhish:** Powerful open-source phishing framework.
     * **MaskPhish:** Tool for creating masked URLs for phishing.
     * **zPhisher:** Another social engineering phishing tool.
-    * **InstaInsane:** Instagram password brute-force tool.
 * **Wireless Attacks:**
     * **Fluxion:** Tool for capturing Wi-Fi handshakes.
 * **Network Attacks:**
