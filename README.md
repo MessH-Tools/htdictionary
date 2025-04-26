@@ -58,9 +58,32 @@ DiCtiONARY provides a menu-driven interface to the following tools:
     ```
 4.  Follow the on-screen menu to select and run the desired tools.
 
+## Alias
+If you want DiCtiONARY to work properly and start it by just typing a word, follow these steps:
+
+1.  **Open the zshrc file:**
+    ```bash
+    nano ~/.zshrc
+    ```
+
+2.  **Scroll to the bottom and add this:**
+    ```bash
+    alias dictionary='<where you saved the folder>'
+    sudo systemctl start for
+    ```
+
+3.  **Save your changes:**
+    ```bash
+    ^X
+    y/Y
+    return
+    ```
+
 ## Disclaimer
 
 This tool is intended for ethical security testing and educational purposes only. The user is solely responsible for any misuse of this tool. Use it only on systems you have explicit permission to test.
+
+# Also you need to set your Own VPN and Proxy server!!
 
 ## Author
 
