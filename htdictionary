@@ -1,0 +1,66 @@
+#!/bin/bash
+
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+magenta='\033[0;35m'
+cyan='\033[0;36m'
+white='\033[0;37m'
+reset='\033[0m'
+term_width=$(tput cols)
+
+# x = color
+# preset: echo -e "${COLOR}...{RESET}"
+
+echo -e "$blue"
+figlet -f slant "MyTool" 2>/dev/null || echo -e "${green}Starting MyTool..."
+echo -e "${reset}"
+
+# typing effect
+
+typing_effect() {
+	message="$1"
+	for ((i=0; i<${#message}; i++)); do
+	 echo -ne "${yellow}${message:$i:1}${reset}"
+ 	 sleep 0.087
+	done
+	echo ""
+}
+
+typing_effect "Initializing modules..."
+
+
+# spinner animation
+fancy_spinner() {
+ local spin=('l      ''lo     ''loa    ''load   ''loadi  ''loadin ''loading')
+ local i=7
+ while :; do
+  i=$(( (i+7) % ${#spin} ))
+  echo -ne  "\r${green}${spin:$i:7}"
+  sleep 0.2
+done
+}
+
+(sleep 5) &
+spinner_pid=$!
+fancy_spinner &
+spinner_bg=$!
+wait $spinner_pid
+kill $spinner_bg &>/dev/null
+echo -e "\r$green Ready! $reset"
+
+
+
+# center text cmd
+center_text() {
+ local text="$1"
+ local len=${#text}
+ local padding=$(( (term_width - len) / 2 ))
+ printf "%*s%s\n" $padding "" "text"
+}
+
+
+
+
+
