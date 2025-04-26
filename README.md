@@ -1,8 +1,8 @@
 ![Hack Tool Dictionary](https://github.com/MessH-Tools/htdictionary/blob/main/Images/dictionary-main.png)
 
-![Certified](https://img.shields.io/badge/DiCtiONARY_by-mesH-cyan)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/Apache_2.0)
-[![Author: mesh](https://img.shields.io/badge/Author-mesh-blue)](https://github.com/Meson-Tools)
+[![Name and Author](https://img.shields.io/badge/DiCtiONARY_by-mesH-cyan)](https://github.com/MessH-Tools/htdictionary)
+[![Author: mesh](https://img.shields.io/badge/Author-mesh-blue)](https://github.com/MessH-Tools)
+[![License: MIT](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)]([https://opensource.org/licenses/Apache_2.0])
 [![Kali Linux](https://img.shields.io/badge/Kali_Linux-black?style=flat-square&logo=kali-linux&logoColor=white)](https://www.kali.org/)
 
 Thank you for taking a look this Tool!
