@@ -69,7 +69,7 @@ If you want DiCtiONARY to work properly and start it by just typing a word, foll
 2.  **Scroll to the bottom and add this:**
     ```bash
     alias dictionary='<where you saved the folder>'
-    sudo systemctl start for
+    sudo systemctl start tor
     ```
 
 3.  **Save your changes:**
